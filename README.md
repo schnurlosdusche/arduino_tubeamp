@@ -2,8 +2,7 @@
 control tube heater and anode supply with arduino nano
 
 --------------------------------------------------------------------------------------------------
-                                        DISCLAIMER
---------------------------------------------------------------------------------------------------
+                                                 DISCLAIMER
 
 !! Attention : Working with mains power or high DC voltages, like in tube amps used,
 serious injury might occur or death. Always make sure, the tube amp is free of any
