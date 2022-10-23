@@ -17,9 +17,9 @@ int BRIGHTNESS = 96;			// change this value for the LED brightness (0-255)
 int ORIG_BRIGHTNESS;
 int DIM_BRIGHTNESS;
 
-const word ANODE_RELAY_PIN = A2;	// Pins for controlling the relay board
+const word ANODE_RELAY_PIN = A2;	// Pins for controlling the relay boards
 const word HEATER_RELAY_PIN = A3;	// ..
-const word HEATER_PIN = A6;		// Pins for measuring the voltage ( over a voltage devider )
+const word HEATER_PIN = A6;		// Pins for measuring the voltages ( each over a voltage devider )
 const word ANODE_PIN = A7;		// ..
 
 int a=0;
