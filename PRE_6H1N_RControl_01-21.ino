@@ -1,4 +1,4 @@
-// PreAmp 6H1N - Relay Controller Arduino Nano V0.1.21 14.10.2022
+// PreAmp 6H1N - Relay Controller Arduino Nano V0.1.21
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
