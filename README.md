@@ -15,7 +15,7 @@ Use these information on your own risk.
 --------------------------------------------------------------------------------------------------
 
 I installed an arduino nano in my selfmade tube-preamp to monitor and control the voltages for 
-the tubes.
+the tubes. My preamp uses a 6H1N and a EAA91 for each channel. 
 
 The best way to start a tube amp, is to preheat the tubes for a recent time before applying the
 higher anode voltage. In my case, a voltage of around 90VDC is used as anode voltage.
