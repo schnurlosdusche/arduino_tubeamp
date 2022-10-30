@@ -1,5 +1,8 @@
 # arduino_tubeamp
-control tube heater and anode supply with arduino nano
+
+<p align="center">
+  <img src="https://github.com/schnurlosdusche/arduino_tubeamp/blob/main/PRE_1.png" width="640" title="PRE6H1N">
+</p>
 
 --------------------------------------------------------------------------------------------------
                                                  DISCLAIMER
@@ -43,6 +46,11 @@ project. Ths U-shaped part will be fitted to the bottom of the preamp, so the ot
 in and provide a safe connection beside a hold for the display. The rectangular space on both parts
 give enough room for a 4-pin "Dupont" connector. On the display side male and the preamp-side female.
 
+<p align="center">
+  <img src="https://github.com/schnurlosdusche/arduino_tubeamp/blob/main/I2C_Displaymount_3.png" width="640" title="PRE6H1N">
+</p>
+
+
 In the meantime, I printed a few of these parts and they all fit very well and provide a strong and
 simple connection in both ways, electrically and mechanically. There is just no possibility to 
 connect the I2C bus in a wrong way... 
@@ -67,7 +75,7 @@ The nodemcu could forward these information via MQTT to a server, where the valu
 The only downside of using a nodemcu so near or inside a tube preamp is the radio frequency from the
 WiFi/Bluetooth module. I guess, I have to test that... 
 
-- Finding relays to handle high voltages of appr 360VDC for my other tubeamps... so theycan also be 
+- Finding relays to handle high voltages of appr 360VDC for my other tubeamps... so they can also be 
 monitored and controlled.
 
 This project is still a work in progress...
