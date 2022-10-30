@@ -15,10 +15,14 @@ Use these information on your own risk.
 --------------------------------------------------------------------------------------------------
 
 I installed an arduino nano in my selfmade tube-preamp to monitor and control the voltages for 
-the tubes. My preamp uses a 6H1N and a EAA91 for each channel. 
+the tubes. My preamp uses a 6H1N and an EAA91 for each channel. 
 
 The best way to start a tube amp, is to preheat the tubes for a recent time before applying the
 higher anode voltage. In my case, a voltage of around 90VDC is used as anode voltage.
+Nowerdays (and I guess the future in general), tubes are getting more and more expensive and
+sometimes almost impossible to get/buy (especially some kinds). If there is a way, to maximize
+their lifespan, this project seems for me to be a logical way. So why not use a technology
+that is simple, cheap and easy to build on your own ?
 
 The Nano measures the voltages of 6.3VDC and the 90VDC in the first step after applying mains
 power to the preamp. Within 5 seconds, both power supplies should stabilize. Are both voltages within
@@ -35,10 +39,40 @@ a message is shown on the display telling you, which voltage fails and the corre
 
 The 20x4 display sits in a 3D printed case, that can be mounted when needed. For this, I designed
 an easy mount connection, that includes the 4-pin I2C connection. See the provided STL files within this
-project.
+project. Ths U-shaped part will be fitted to the bottom of the preamp, so the other part can slide 
+in and provide a safe connection beside a hold for the display. The rectangular space on both parts
+give enough room for a 4-pin "Dupont" connector. On the display side male and the preamp-side female.
+
+In the meantime, I printed a few of these parts and they all fit very well and provide a strong and
+simple connection in both ways, electrically and mechanically. There is just no possibility to 
+connect the I2C bus in a wrong way... 
+
+I do not provide the case for the display as .stl file, as there are different types of displays
+and so, the build volume / size might differ from the one, I use. I simply glued my case for the 
+display to the arm, so you can do, too. 
+
+The only requirement regarding the display is the ability, to use an I2C connection for the
+communication. You may adjust the code to use a 16x2 character display...
+
+Future plans :
+
+- Switching the pre out ports by relay. Shorten them to ground during preheating and in case of
+an error that is detected by the arduino...
+
+- Monitoring the current for the heater and defining the duration of the preheating process depending
+on the current (current will be higher when tubes are "cold" and decreases during warm up)
+The arduino nano can communicate with a Nodemcu (ESP8266) via the I2C bus and report the voltages 
+and the current for long term statistics. I expect to see a slight change in the values over time...
+The nodemcu could forward these information via MQTT to a server, where the values can be stored.
+The only downside of using a nodemcu so near or inside a tube preamp is the radio frequency from the
+WiFi/Bluetooth module. I guess, I have to test that... 
+
+- Finding relays to handle high voltages of appr 360VDC for my other tubeamps... so theycan also be 
+monitored and controlled.
 
 This project is still a work in progress...
 
 ----------------------------------------------------------------------------------------------------
 
-Feel free to get in contact with me : github (at) schnurlosdusche (dot) de
+More information will soon be available on my webiste : schnurlosdusche (dot) de
+Feel free to get in contact with me : tubes (at) schnurlosdusche (dot) de
