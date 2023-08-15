@@ -26,12 +26,16 @@ int a=0;
 int i=0;
 
 float HEATER_MIN_VALUE = 6.0;           // acc to datasheet of tube 6H1N min 6.0V
-float HEATER_MAX_VALUE = 6.9;           // acc to datasheet of tube 6H1N max 6.6V
-float ANODE_MIN_VALUE = 80.0;		 
-float ANODE_MAX_VALUE = 91.5;
+float NORMAL_HEATER_MAX_VALUE = 6.7;    // acc to datasheet of tube 6H1N max 6.6V
+float INITIAL_HEATER_MAX_VALUE = 7.3;	// set to NORMAL_HEATER_MAX_VALUE if your power supply is stabilized to 6.3V.
+					// My power supply outputs a voltage around 7V without any load,
+					// so very often I get an overvoltage error. With load applied
+					// (HEATER relay active), the voltage drops back to the desired range... 
+float ANODE_MIN_VALUE = 80.0;		// lower end of anode voltage range (for this particular preamp !)  
+float ANODE_MAX_VALUE = 91.5;		// upper end of anode voltage range (for this particular preamp !)
 float HEATER_VALUE;			// variable for the measured voltage
 float ANODE_VALUE;			// ..
-float LOAD_PERCENTAGE;			
+float LOAD_PERCENTAGE;			// percentage value during preheating process (will be shown in display)
 
 char ERROR_MSG_1[21] = "ERR - Heater Voltage";
 char ERROR_MSG_2[21] = "ERR - Anode Voltage";
@@ -40,7 +44,8 @@ bool HEATER = false;			// false = voltage not in range | true = voltage within r
 bool PREHEATING = false;		// preheating ready ? status of preheating
 bool ANODE = false;			// false = voltage not in range | true = voltage within range
 
-LiquidCrystal_I2C lcd(0x27,20,4);	// initiate the I2C 20x4 display. 
+LiquidCrystal_I2C lcd(0x27,20,4);	// initialize the I2C bus for the 20x4 display. 
+					// set the HEX address to your needs (e.g. 0x30)
 
 void setup() 
 {
@@ -61,43 +66,48 @@ void setup()
   leds[0] = CRGB::Blue;			// set LED color BLUE on start
   FastLED.show();			// ..
   
-  lcd.init();				// initiate the I2C 20x4 display
+  lcd.init();				// initialize the display
   lcd.backlight();			// turn on the backlight of the display
     
   lcd.setCursor(6,0); 			// set cursor to position...
   lcd.print("PRE6H1N");			// and show something
   lcd.setCursor(3,2);			// ..
-  lcd.print("Version 0.1.21");		// ..
+  lcd.print("Version 0.1.22");		// ..
   
   delay(5000);
 
-  lcd.setCursor(0,2); // set cursor to 1 symbol of 1 line
+  lcd.setCursor(0,2); 			// set cursor
   lcd.print("checking voltages...");
 
-  // wait max 30 seconds to let the voltages stabilize. 
+  // wait max 30 seconds (60 x 500ms) to let the voltages stabilize. 
   // If that fails, LED flashes red in a deadlock and shows message on display
- 
+
+  // If the voltages got stabilized within the defined range and time, set HEATER and ANODE
+  // true (done in "readOutVoltages") to interrupt the "while loop" and continue with the normal operation 
   while (( i < 60 ) && ((HEATER == false) && (ANODE == false))) 
       {
         readOutVoltages();
         delay(500);
-  	lcd.setCursor(0,1); // set cursor to 1 symbol of 1 line
+  	lcd.setCursor(0,1); 		// set cursor
         lcd.print("waiting for voltages");
-        lcd.setCursor(0,2); // set cursor to 1 symbol of 1 line
+        lcd.setCursor(0,2); 		// set cursor
         lcd.print("to stabilize...     ");
         i++;
       }
 
-  // if the counter 
+  // if the counter exceeds 59 (almost half a minute), guess the power supply to be faulty or
+  // at least, having a bad day or problem :(
   if ( i > 59 )
       {
         while (i)			// a never ending loop (deadlock)
           {
-            lcd.setCursor(0,1); // set cursor to 1 symbol of 1 line
+            lcd.setCursor(0,1); // set cursor to 1st symbol of 1st line
             lcd.print("ERROR - Voltages not");
-            lcd.setCursor(0,2); // set cursor to 1 symbol of 1 line
+            lcd.setCursor(0,2); // set cursor to 1st symbol of 2nd line
             lcd.print("in defined range  :(");
 
+	    // start flashing the LED red... forever and ever... 
+	    // the preamp must be turned off and on to reset this state
             FastLED.setBrightness(128);
             leds[0] = CRGB::Red;
             FastLED.show();
@@ -109,6 +119,8 @@ void setup()
           }
       }
 
+  // if at least the HEATER is true (voltage in range), start the preheating process.
+  // In this case, it is more important to have a correct HEATER VOLTAGE than ANODE VOLTAGE !
   if (HEATER == true)
   {
       preheating();
@@ -116,12 +128,13 @@ void setup()
 
 }
 
+// main loop. this is for the normal operation
 void loop() 
-	{
+{
   readOutVoltages();
 
-	if ((ANODE == true)&&(HEATER == true))
-		{ 
+  if ((ANODE == true)&&(HEATER == true))
+    { 
       if (PREHEATING == true)	 
         {
           FastLED.setBrightness(48);
@@ -144,7 +157,7 @@ void loop()
         }
     }
      else
-		{ 
+	{ 
         FastLED.setBrightness(BRIGHTNESS);
         leds[0] = CRGB::Red;
         FastLED.show();
@@ -190,6 +203,19 @@ void loop()
   
 void readOutVoltages()
 {
+
+  // If the preamp has an unstabilized power supply for the HEATER,
+  // a higher voltage during unloaded condition might occur, that prevents the
+  // process to start the preheating (as it thinks, the HEATER voltage is too 
+  // high). But when load is applied by the HEATER coils, the voltage drops
+  // back to normal range. For this case, we use an additional variable with
+  // a slightly higher MAX VOLTAGE.
+	
+  if ( PREHEATING == false )
+  	{ HEATER_MAX_VALUE = INITIAL_HEATER_MAX_VALUE; }
+  else
+  	{ HEATER_MAX_VALUE = NORMAL_HEATER_MAX_VALUE; } 	
+	
   HEATER_VALUE = analogRead(HEATER_PIN); // Probe Input
   HEATER_VALUE = HEATER_VALUE * (5.0 / 1023); HEATER_VALUE = (HEATER_VALUE * 1.525);
   ANODE_VALUE = analogRead(ANODE_PIN); // Probe Input
@@ -238,6 +264,8 @@ void preheating()
         delay(15);
       }
 
+      // the factor 4.6 is needed to calculate the shown percentage of the preheating
+      // process
       LOAD_PERCENTAGE = ( a * 4.6 );
       lcd.setCursor(17,2);
       lcd.print(LOAD_PERCENTAGE,0); lcd.print("%");
